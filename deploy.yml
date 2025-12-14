@@ -1,0 +1,40 @@
+name: Build and Deploy Notebook
+
+on:
+  push:
+    branches:
+      - main  # Ganti dengan 'master' jika branch utamamu master
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Jupyter and dependencies
+        run: |
+          pip install jupyter nbconvert
+
+      - name: Convert Notebooks to HTML
+        run: |
+          # Perintah ini akan convert semua file .ipynb jadi .html
+          jupyter nbconvert --to html *.ipynb
+          
+          # Opsional: Rename file notebook utamamu jadi index.html biar jadi homepage
+          # mv nama_file_kamu.html index.html 
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: . # Mengambil file dari root directory (termasuk hasil convert tadi)
+          keep_files: true # Supaya file lain gak kehapus
