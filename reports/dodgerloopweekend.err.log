@@ -18,70 +18,121 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import numpy as np
-import pandas as pd
+import gradio as gr
 import matplotlib.pyplot as plt
-import seaborn as sns
-from tslearn.datasets import UCR_UEA_datasets
-from tslearn.preprocessing import TimeSeriesScalerMinMax
+import re  # Import modul Regex untuk pemisahan teks yang lebih canggih
 
-# --- Konfigurasi ---
-DATASET_NAME = "DodgerLoopWeekend"
+# --- FUNGSI KLASIFIKASI SUPER FLEKSIBEL ---
+def classify_traffic(input_text, use_example_idx):
+    try:
+        data_to_predict = None
+        input_source = ""
+        actual_label = "-"
 
-print(f"Sedang memuat dataset {DATASET_NAME}...")
+        # 1. Cek Input Manual Terlebih Dahulu
+        if input_text is not None and input_text.strip() != "":
+            try:
+                # --- LOGIKA BARU: MEMISAHKAN ANGKA ---
+                # re.split akan memotong teks berdasarkan:
+                # [,\s\n]+  --> Koma, Spasi, atau Enter (Newline)
+                # input_text.strip() untuk buang spasi di awal/akhir
+                
+                raw_values = re.split(r'[,\s\n\t]+', input_text.strip())
+                
+                # Filter: Hapus string kosong jika ada (akibat spasi ganda dsb)
+                values = [float(x) for x in raw_values if x != ""]
+                
+                if len(values) == 0:
+                    return "Error: Tidak ada angka yang terbaca.", None
 
-# Menggunakan loader dari tslearn untuk mengambil data UCR secara otomatis
-# Jika gagal load online, kamu bisa ganti bagian ini dengan load file lokal
-loader = UCR_UEA_datasets()
-X_train_org, y_train_org, X_test_org, y_test_org = loader.load_dataset(DATASET_NAME)
+                # Reshape ke format model (Batch, Length, Channel)
+                data_arr = np.array(values).reshape(1, -1, 1)
+                
+                data_to_predict = data_arr
+                actual_label = "Tidak diketahui (Input Manual)"
+                input_source = "Input Manual (Fleksibel)"
+                
+            except ValueError:
+                return "Error: Input mengandung huruf atau simbol yang bukan angka.", None
 
-print("\n--- Statistik Awal Data Asli (Sebelum Digabung) ---")
-print(f"Jumlah Train Asli: {X_train_org.shape[0]}")
-print(f"Jumlah Test Asli : {X_test_org.shape[0]}")
-print(f"Panjang Series   : {X_train_org.shape[1]}")
-print(f"Jumlah Channel   : {X_train_org.shape[2]} (Univariate)")
+        # 2. Jika Input Manual kosong, Cek Index
+        elif use_example_idx is not None:
+            idx = int(use_example_idx)
+            if idx < 0 or idx >= len(X_deploy):
+                return f"Error: Index {idx} di luar jangkauan (0 - {len(X_deploy)-1}).", None
+            
+            data_to_predict = X_deploy[idx].reshape(1, -1, 1)
+            actual_label = str(y_deploy[idx])
+            input_source = f"Data Implementasi Index ke-{idx}"
+        
+        else:
+            return "Mohon isi Input Manual atau Pilih Index.", None
 
-# --- Analisis Kelas dan Tipe Data ---
-unique_classes, counts = np.unique(y_train_org, return_counts=True)
-print(f"\nKelas yang tersedia: {unique_classes}")
-# Biasanya kelas 1 = Game, 2 = No Game (atau sebaliknya, kita perlu cek dokumentasi/visualisasi)
+        # --- Lakukan Prediksi ---
+        prediction = knn_dtw.predict(data_to_predict)[0]
+        
+        # --- Plotting ---
+        fig = plt.figure(figsize=(10, 4))
+        plt.plot(data_to_predict[0].ravel(), color='blue', label='Input Series')
+        plt.title(f"Waveform Input\nPrediksi Model: KELAS {prediction}")
+        plt.xlabel("Waktu")
+        plt.ylabel("Volume")
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+        plt.tight_layout()
+        
+        plot_path = "prediction_plot_flex.png"
+        plt.savefig(plot_path)
+        plt.close()
 
-# Visualisasi Data Mentah
-# Mencari index pertama yang mewakili masing-masing kelas untuk sampel
-idx_class_1 = np.where(y_train_org == 1)[0][0]
-idx_class_2 = np.where(y_train_org == 2)[0][0]
+        result_text = (
+            f"Sumber Data: {input_source}\n"
+            f"Panjang Data: {data_to_predict.shape[1]} titik waktu\n"
+            f"Label Asli (jika ada): {actual_label}\n"
+            f"----------------------------------\n"
+            f"HASIL PREDIKSI: KELAS {prediction}\n"
+        )
+        
+        return result_text, plot_path
 
-# Ukuran diperlebar lagi (24, 6) agar muat 4 plot dengan jelas
-plt.figure(figsize=(24, 6))
+    except Exception as e:
+        return f"System Error: {str(e)}", None
 
-# Plot 1: Contoh Waveform Kelas 1
-plt.subplot(1, 4, 1)
-plt.plot(X_train_org[idx_class_1].ravel(), color='blue')
-plt.title(f"Contoh Waveform (Kelas 1)\nIndex: {idx_class_1}")
-plt.xlabel("Waktu")
-plt.ylabel("Volume Kendaraan")
-plt.grid(True, alpha=0.3)
+# --- ANTARMUKA GRADIO ---
+with gr.Blocks() as demo:
+    gr.Markdown("# Klasifikasi Time Series: DodgerLoopWeekend")
+    
+    with gr.Row():
+        with gr.Column():
+            inp_text = gr.Textbox(
+                label="1. Input Manual (Bebas Format: Spasi/Koma/Enter)", 
+                placeholder="Paste data angka di sini...",
+                lines=8
+            )
+            inp_idx = gr.Number(
+                label="2. Atau Gunakan Index Data Deploy", 
+                value=None,
+                precision=0
+            )
+            btn = gr.Button("Prediksi", variant="primary")
+            
+        with gr.Column():
+            out_text = gr.Textbox(label="Hasil Analisis")
+            out_plot = gr.Image(label="Visualisasi Sinyal")
 
-# Plot 2: Contoh Waveform Kelas 2
-plt.subplot(1, 4, 2)
-plt.plot(X_train_org[idx_class_2].ravel(), color='orange')
-plt.title(f"Contoh Waveform (Kelas 2)\nIndex: {idx_class_2}")
-plt.xlabel("Waktu")
-plt.grid(True, alpha=0.3)
+    btn.click(fn=classify_traffic, inputs=[inp_text, inp_idx], outputs=[out_text, out_plot])
 
-plt.tight_layout()
-plt.show()
+print("Menjalankan Gradio...")
+demo.launch()
 ------------------
 
 
 [31m---------------------------------------------------------------------------[39m
 [31mModuleNotFoundError[39m                       Traceback (most recent call last)
-[36mCell[39m[36m [39m[32mIn[1][39m[32m, line 5[39m
-[32m      3[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mmatplotlib[39;00m[34;01m.[39;00m[34;01mpyplot[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mplt[39;00m
-[32m      4[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mseaborn[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01msns[39;00m
-[32m----> [39m[32m5[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mtslearn[39;00m[34;01m.[39;00m[34;01mdatasets[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m UCR_UEA_datasets
-[32m      6[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mtslearn[39;00m[34;01m.[39;00m[34;01mpreprocessing[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m TimeSeriesScalerMinMax
-[32m      8[39m [38;5;66;03m# --- Konfigurasi ---[39;00m
+[36mCell[39m[36m [39m[32mIn[7][39m[32m, line 1[39m
+[32m----> [39m[32m1[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mgradio[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mgr[39;00m
+[32m      2[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mmatplotlib[39;00m[34;01m.[39;00m[34;01mpyplot[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mplt[39;00m
+[32m      3[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mre[39;00m  [38;5;66;03m# Import modul Regex untuk pemisahan teks yang lebih canggih[39;00m
 
-[31mModuleNotFoundError[39m: No module named 'tslearn'
+[31mModuleNotFoundError[39m: No module named 'gradio'
 

@@ -491,11 +491,9 @@ pola lalu lintas dalam interval waktu tertentu.</p>
 <h2>Kelas (Target)<a class="headerlink" href="#kelas-target" title="Link to this heading">#</a></h2>
 <p>Dataset ini merupakan <strong>klasifikasi biner</strong>, dengan:</p>
 <ul class="simple">
-<li><p><strong>Kelas 0</strong> : Pola lalu lintas normal</p></li>
-<li><p><strong>Kelas 1</strong> : Pola lalu lintas tidak normal / kejadian tertentu</p></li>
+<li><p><strong>Kelas 1</strong> : Weekday</p></li>
+<li><p><strong>Kelas 2</strong> : Weekend</p></li>
 </ul>
-<p>Label disajikan dalam bentuk numerik dan akan digunakan langsung
-tanpa encoding tambahan.</p>
 </section>
 <section id="distribusi-data">
 <h2>Distribusi Data<a class="headerlink" href="#distribusi-data" title="Link to this heading">#</a></h2>
@@ -505,6 +503,27 @@ tanpa encoding tambahan.</p>
 <li><p>Data uji (test) lebih banyak
 Sehingga dilakukan penggabungan data untuk meningkatkan stabilitas model.</p></li>
 </ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>tslearn
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: tslearn in /usr/local/python/3.12.1/lib/python3.12/site-packages (0.7.0)
+Requirement already satisfied: scikit-learn&gt;=1.4 in /home/codespace/.local/lib/python3.12/site-packages (from tslearn) (1.7.2)
+Requirement already satisfied: numpy&gt;=1.24.3 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from tslearn) (1.26.4)
+Requirement already satisfied: scipy&gt;=1.10.1 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from tslearn) (1.11.4)
+Requirement already satisfied: numba&gt;=0.58.1 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from tslearn) (0.63.1)
+Requirement already satisfied: joblib&gt;=1.2 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from tslearn) (1.3.2)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: llvmlite&lt;0.47,&gt;=0.46.0dev0 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from numba&gt;=0.58.1-&gt;tslearn) (0.46.0)
+Requirement already satisfied: threadpoolctl&gt;=3.1.0 in /home/codespace/.local/lib/python3.12/site-packages (from scikit-learn&gt;=1.4-&gt;tslearn) (3.6.0)
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -564,18 +583,24 @@ Sehingga dilakukan penggabungan data untuk meningkatkan stabilitas model.</p></l
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
-<span class="ne">----&gt; </span><span class="mi">5</span> <span class="kn">from</span><span class="w"> </span><span class="nn">tslearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">UCR_UEA_datasets</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="kn">from</span><span class="w"> </span><span class="nn">tslearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeSeriesScalerMinMax</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="c1"># --- Konfigurasi ---</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;tslearn&#39;
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/usr/local/python/3.12.1/lib/python3.12/site-packages/tslearn/bases/bases.py:16: UserWarning: h5py not installed, hdf5 features will not be supported.
+Install h5py to use hdf5 features: http://docs.h5py.org/
+  warn(h5py_msg)
 </pre></div>
 </div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Sedang memuat dataset DodgerLoopWeekend...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>--- Statistik Awal Data Asli (Sebelum Digabung) ---
+Jumlah Train Asli: 20
+Jumlah Test Asli : 138
+Panjang Series   : 288
+Jumlah Channel   : 1 (Univariate)
+
+Kelas yang tersedia: [1 2]
+</pre></div>
+</div>
+<img alt="_images/521250f7c05fb11656528579810867be79920182db186c3b040aa9eeea6facfc.png" src="_images/521250f7c05fb11656528579810867be79920182db186c3b040aa9eeea6facfc.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -588,7 +613,7 @@ Sehingga dilakukan penggabungan data untuk meningkatkan stabilitas model.</p></l
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">ax1</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">y_train_org</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Distribusi Kelas: Train Set Asli</span><span class="se">\n</span><span class="s2">(Total: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train_org</span><span class="p">)</span><span class="si">}</span><span class="s2"> data)&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Kelas (1=Game, 2=No Game)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Kelas (1=Weekday, 2=Weekend)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Jumlah Data&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 <span class="c1"># Menambahkan angka di atas batang</span>
@@ -599,7 +624,7 @@ Sehingga dilakukan penggabungan data untuk meningkatkan stabilitas model.</p></l
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">ax2</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">y_test_org</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;magma&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Distribusi Kelas: Test Set Asli</span><span class="se">\n</span><span class="s2">(Total: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test_org</span><span class="p">)</span><span class="si">}</span><span class="s2"> data)&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Kelas (1=Game, 2=No Game)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Kelas (1=Weekday, 2=Weekend)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Jumlah Data&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 <span class="c1"># Menambahkan angka di atas batang</span>
@@ -612,7 +637,19 @@ Sehingga dilakukan penggabungan data untuk meningkatkan stabilitas model.</p></l
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/cd176742bbddcd1097b7379adb37ca757c97a61fe264c5d659dd132b340a1ea9.png" src="_images/cd176742bbddcd1097b7379adb37ca757c97a61fe264c5d659dd132b340a1ea9.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_9455/937466930.py:7: FutureWarning: 
+
+Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
+
+  ax1 = sns.countplot(x=y_train_org, palette=&quot;viridis&quot;)
+/tmp/ipykernel_9455/937466930.py:18: FutureWarning: 
+
+Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
+
+  ax2 = sns.countplot(x=y_test_org, palette=&quot;magma&quot;)
+</pre></div>
+</div>
+<img alt="_images/11222747d41d1f9c38a539e5635aaa6eebc651f7f7f39b5a9f269a3c4a26cbb3.png" src="_images/11222747d41d1f9c38a539e5635aaa6eebc651f7f7f39b5a9f269a3c4a26cbb3.png" />
 </div>
 </div>
 </section>
@@ -701,10 +738,13 @@ Sehingga dilakukan penggabungan data untuk meningkatkan stabilitas model.</p></l
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total Data setelah digabung: 158
 Ditemukan Missing Values. Melakukan interpolasi...
-Data valid setelah cleaning sederhana: 158
-Distribusi Kelas Total: {np.int64(1): np.int64(112), np.int64(2): np.int64(46)}
-
---- Hasil Pembagian Data ---
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Data valid setelah cleaning sederhana: 158
+Distribusi Kelas Total: {1: 112, 2: 46}
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>--- Hasil Pembagian Data ---
 Train Set (70%)   : (110, 288, 1)
 Test Set (20%)    : (32, 288, 1)
 Deploy Set (10%)  : (16, 288, 1) (Disimpan untuk demo Gradio)
@@ -784,7 +824,7 @@ Pelatihan selesai.
 weighted avg       1.00      1.00      1.00        32
 </pre></div>
 </div>
-<img alt="_images/1a7517039ae14cd8f55933c92c35abafd171e03f3e4ad4534c1ebcbaf75e76de.png" src="_images/1a7517039ae14cd8f55933c92c35abafd171e03f3e4ad4534c1ebcbaf75e76de.png" />
+<img alt="_images/7527f4df8f4ba0710e414ab714eb270ea23613b48de1a50b963e12c299235d39.png" src="_images/7527f4df8f4ba0710e414ab714eb270ea23613b48de1a50b963e12c299235d39.png" />
 </div>
 </div>
 </section>
@@ -904,12 +944,14 @@ weighted avg       1.00      1.00      1.00        32
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Menjalankan Gradio...
-* Running on local URL:  http://127.0.0.1:7865
-* To create a public link, set `share=True` in `launch()`.
-</pre></div>
-</div>
-<div class="output text_html"><div><iframe src="http://127.0.0.1:7865/" width="100%" height="500" allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" frameborder="0" allowfullscreen></iframe></div></div><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">import</span><span class="w"> </span><span class="nn">gradio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gr</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>  <span class="c1"># Import modul Regex untuk pemisahan teks yang lebih canggih</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;gradio&#39;
 </pre></div>
 </div>
 </div>
