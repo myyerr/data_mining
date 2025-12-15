@@ -1,0 +1,98 @@
+Traceback (most recent call last):
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/nbclient/client.py", line 1319, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/asyncio/base_events.py", line 684, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import openeo
+from shapely.geometry import shape
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+# Koneksi & autentikasi ke Copernicus Data Space Ecosystem
+connection = openeo.connect("openeo.dataspace.copernicus.eu").authenticate_oidc()
+
+# Definisi area Bangkalan (AOI)
+aoi = {
+    "type": "Polygon",
+    "coordinates": [
+        [
+            [112.73853929664097, -7.023628073721952],
+            [112.73853929664097, -7.05158377585353],
+            [112.7680283135615, -7.05158377585353],
+            [112.7680283135615, -7.023628073721952],
+            [112.73853929664097, -7.023628073721952],
+        ]
+    ],
+}
+
+# Memuat koleksi data Sentinel-5P (NO2) dari Copernicus
+s5p = connection.load_collection(
+    "SENTINEL_5P_L2",
+    temporal_extent=["2024-10-24", "2025-10-24"],   # rentang waktu pengambilan data
+    spatial_extent={
+        "west": 112.73853929664097,
+        "south": -7.05158377585353,
+        "east": 112.7680283135615,
+        "north": -7.023628073721952
+    },
+    bands=["NO2"],   # variabel polutan yang diambil
+)
+
+def mask_invalid(x):
+    return x < 0
+
+s5p_masked = s5p.mask(s5p.apply(mask_invalid))
+
+daily_mean = s5p_masked.aggregate_temporal_period(period="day", reducer="mean")
+
+daily_mean_aoi = daily_mean.aggregate_spatial(geometries=aoi, reducer="mean")
+
+# Definisikan area sebagai FeatureCollection (untuk agregasi spasial)
+feature = {"type": "Feature", "geometry": aoi, "properties": {"id": 1}}
+fc = {"type": "FeatureCollection", "features": [feature]}
+
+job = daily_mean_aoi.execute_batch(out_format="CSV")
+
+results = job.get_results()
+results.download_files("data-copernicus")
+
+for f in os.listdir("data-copernicus"):
+    if f.endswith(".csv"):
+        df = pd.read_csv(os.path.join("data-copernicus", f))
+        print("File ditemukan:", f)
+        break
+
+df["date"] = pd.to_datetime(df["date"])
+
+df["month"] = df["date"].dt.to_period("M")
+
+df_monthly = df.groupby("month", as_index=False)["NO2"].mean()
+
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mModuleNotFoundError[39m                       Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[1][39m[32m, line 1[39m
+[32m----> [39m[32m1[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mopeneo[39;00m
+[32m      2[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mshapely[39;00m[34;01m.[39;00m[34;01mgeometry[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m shape
+[32m      3[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mpandas[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mpd[39;00m
+
+[31mModuleNotFoundError[39m: No module named 'openeo'
+

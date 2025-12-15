@@ -1,0 +1,108 @@
+Traceback (most recent call last):
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/nbclient/client.py", line 1319, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/asyncio/base_events.py", line 684, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import pandas as pd
+import numpy as np
+
+df = input_table_1.copy()
+
+print("HASIL ANALISIS DATASET ECOLI")
+print("\n")
+
+
+print("1. Analisa Missing Values")
+missing_values = df.isnull().sum()
+missing_percentage = (missing_values / len(df)) * 100
+missing_info = pd.DataFrame({'Jumlah Missing': missing_values, 'Persentase (%)': missing_percentage})
+
+if missing_info['Jumlah Missing'].sum() > 0:
+    print(missing_info[missing_info['Jumlah Missing'] > 0])
+else:
+    print("Tidak ditemukan adanya missing values pada dataset.")
+
+
+print("2. Analisa Outlier (Metode IQR)")
+
+numeric_cols = df.select_dtypes(include=np.number).columns
+outlier_summary = {}
+
+for col in numeric_cols:
+    Q1 = df[col].quantile(0.25)
+    Q3 = df[col].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    # Hitung jumlah outlier
+    outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
+    num_outliers = len(outliers)
+    
+    if num_outliers > 0:
+        outlier_summary[col] = num_outliers
+
+# Tampilkan ringkasan outlier
+if outlier_summary:
+    print("Jumlah outlier yang terdeteksi di setiap kolom:")
+    for col, count in outlier_summary.items():
+        print(f"- Kolom '{col}': {count} data outlier")
+else:
+    print("Tidak ditemukan outlier signifikan menggunakan metode IQR.")
+
+
+
+print("3. Analisa Ketidakseimbangan Data (Unbalanced Data)")
+
+target_col = 'class'
+
+if target_col in df.columns:
+    class_distribution = df[target_col].value_counts()
+    class_percentage = df[target_col].value_counts(normalize=True) * 100
+    balance_info = pd.DataFrame({'Jumlah': class_distribution, 'Persentase (%)': class_percentage.round(2)})
+    
+    print(f"Distribusi kelas pada kolom target '{target_col}':")
+    print(balance_info)
+    
+    # Memberi kesimpulan sederhana tentang keseimbangan data
+    if balance_info['Persentase (%)'].min() < 10:
+        print("\nKesimpulan: Sangat tidak seimbang Dataset ini terindikasi highly unbalanced.")
+    elif balance_info['Persentase (%)'].min() < 25:
+        print("\nKesimpulan: Tidak seimbang Dataset ini terindikasi unbalanced.")
+    else:
+        print("\nKesimpulan: Cukup seimbang Dataset ini terlihat cukup seimbang.")
+else:
+    print(f"Peringatan: Kolom target '{target_col}' tidak ditemukan! Harap sesuaikan nama kolom di dalam skrip jika berbeda.")
+
+
+
+output_table_1 = df
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mNameError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[1][39m[32m, line 4[39m
+[32m      1[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mpandas[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mpd[39;00m
+[32m      2[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mnumpy[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mnp[39;00m
+[32m----> [39m[32m4[39m df = [43minput_table_1[49m.copy()
+[32m      6[39m [38;5;28mprint[39m([33m"[39m[33mHASIL ANALISIS DATASET ECOLI[39m[33m"[39m)
+[32m      7[39m [38;5;28mprint[39m([33m"[39m[38;5;130;01m\n[39;00m[33m"[39m)
+
+[31mNameError[39m: name 'input_table_1' is not defined
+
