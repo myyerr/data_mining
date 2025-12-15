@@ -399,6 +399,7 @@ document.write(`
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#data-understanding">Data Understanding</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deskripsi-dataset">Deskripsi Dataset</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tipe-data">Tipe Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pengumpulan-data">Pengumpulan Data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struktur-data">Struktur Data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kelas-target">Kelas (Target)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distribusi-data">Distribusi Data</a></li>
@@ -451,9 +452,7 @@ Weekday dan Weekend.</p>
 <p>Dataset <strong>DodgerLoopWeekend</strong> merupakan dataset time series yang berasal dari
 UCR Time Series Classification Archive. Dataset ini merepresentasikan
 jumlah kendaraan yang terdeteksi oleh loop detector di sekitar Stadion
-Dodger pada akhir pekan (weekend).</p>
-<p>Setiap data menggambarkan satu urutan waktu (time series) yang mencerminkan
-pola lalu lintas dalam interval waktu tertentu.</p>
+Dodger California pada Weekday dan Weekend.</p>
 </section>
 <section id="tipe-data">
 <h2>Tipe Data<a class="headerlink" href="#tipe-data" title="Link to this heading">#</a></h2>
@@ -463,6 +462,10 @@ pola lalu lintas dalam interval waktu tertentu.</p>
 <li><p><strong>Panjang seri</strong>    : Tetap (fixed-length)</p></li>
 <li><p><strong>Jumlah instance</strong> : Relatif kecil (dataset kecil)</p></li>
 </ul>
+</section>
+<section id="pengumpulan-data">
+<h2>Pengumpulan Data<a class="headerlink" href="#pengumpulan-data" title="Link to this heading">#</a></h2>
+<p>Data diambil setiap 5 menit dalam 24 jam sehingga terbentuk 288 pengambilan data dalam 1 waktu 24 jam, total 158 data sehingga data diambil selama 158 hari atau sekitar 5 bulan.</p>
 </section>
 <section id="struktur-data">
 <h2>Struktur Data<a class="headerlink" href="#struktur-data" title="Link to this heading">#</a></h2>
@@ -614,12 +617,12 @@ Kelas yang tersedia: [1 2]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_33677/937466930.py:7: FutureWarning: 
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_48209/937466930.py:7: FutureWarning: 
 
 Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
 
   ax1 = sns.countplot(x=y_train_org, palette=&quot;viridis&quot;)
-/tmp/ipykernel_33677/937466930.py:18: FutureWarning: 
+/tmp/ipykernel_48209/937466930.py:18: FutureWarning: 
 
 Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
 
@@ -804,7 +807,9 @@ Deploy Set (10%)  : (16, 288, 1)
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Sedang melatih model KNN-DTW... (Mungkin memakan waktu tergantung data)
-Pelatihan selesai.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Pelatihan selesai.
 </pre></div>
 </div>
 </div>
@@ -1055,6 +1060,7 @@ weighted avg       1.00      1.00      1.00        32
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#data-understanding">Data Understanding</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deskripsi-dataset">Deskripsi Dataset</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tipe-data">Tipe Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pengumpulan-data">Pengumpulan Data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struktur-data">Struktur Data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kelas-target">Kelas (Target)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distribusi-data">Distribusi Data</a></li>
